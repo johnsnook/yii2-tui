@@ -67,12 +67,13 @@ class Container extends Element {
      * these are attached
      * Then tell all our child elements to show themselves.
      *
+     * @param boolean $forceVisible
      * @return boolean Whether the container was shown
      */
-    public function show() {
-        if (parent::show()) {
+    public function show($forceVisible = false) {
+        if (parent::show($forceVisible)) {
             foreach ($this->elements as $element) {
-                if ($element->show()) {
+                if ($element->show(true)) {
                     $element->afterShow();
                 }
             }
@@ -80,6 +81,27 @@ class Container extends Element {
             return true;
         }
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function afterShow() {
+        parent::afterShow();
+        Tui::$observer->on(Container::AFTER_HIDE_EVENT, function($event) {
+            /** if its me or I'm not visible, bail */
+            if ($this === $event->sender || !$this->visible) {
+                return;
+            }
+            if (Boxy::contains($this->absoluteRectangle, $event->sender->absoluteRectangle)) {
+                $this->redraw($event->sender->absoluteRectangle);
+            } elseif (Boxy::intersects($this->absoluteRectangle, $event->sender->absoluteRectangle)) {
+                $interection = Boxy::intersection($event->sender->absoluteRectangle, $this->absoluteRectangle);
+                $this->redraw($interection);
+            } else {
+
+            }
+        });
     }
 
     /**
@@ -93,7 +115,7 @@ class Container extends Element {
         foreach ($this->elements as $element) {
             $element->hide();
         }
-        Tui::$observer->trigger(self::AFTER_HIDE_EVENT, new ElementEvent);
+        Tui::$observer->trigger(self::AFTER_HIDE_EVENT, new ElementEvent(['sender' => $this]));
     }
 
     /**
@@ -141,27 +163,6 @@ class Container extends Element {
      */
     public function removeElement($id) {
         unset($this->elements[$id]);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function afterShow() {
-        parent::afterShow();
-        Tui::$observer->on(Element::AFTER_HIDE_EVENT, function($event) {
-            /** if its me or I'm not visible, bail */
-            if ($this === $event->sender || !$this->visible) {
-                return;
-            }
-            if (Boxy::contains($this->absoluteRectangle, $event->sender->absoluteRectangle)) {
-                $this->redraw($event->sender->absoluteRectangle);
-            } elseif (Boxy::intersects($this->absoluteRectangle, $event->sender->absoluteRectangle)) {
-                $interection = Boxy::intersection($event->sender->absoluteRectangle, $this->absoluteRectangle);
-                $this->redraw($interection);
-            } else {
-
-            }
-        });
     }
 
     /**

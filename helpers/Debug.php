@@ -15,7 +15,7 @@ use johnsnook\tui\helpers\Screen;
 
 class Debug {
 
-    const LOG_FILE = '/home/jsnook/tui.log';
+    const LOG_FILE = __DIR__ . '/../log/tui.log';
     const EOT = 'EOT';
     const BACKTRACE = 'backtrace';
 

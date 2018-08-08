@@ -291,15 +291,15 @@ class BaseElement extends Component {
      */
     public function getAbsolutePosition() {
 
-        if (($this->style->position === False) || $this->style->position === Style::ABSOLUTE) {
+        if (($this->style->positioning === False) || $this->style->positioning === Style::ABSOLUTE) {
             return $this->position;
-        } elseif ($this->style->position === Style::RELATIVE) {
+        } elseif ($this->style->positioning === Style::RELATIVE) {
             $element = $this;
             $absolut = clone $this->position;
             while ($owner = $element->owner) {
                 $absolut->top += $owner->top - 1;
                 $absolut->left += $owner->left - 1;
-                if ($owner->style->position === Style::ABSOLUTE) {
+                if ($owner->style->positioning === Style::ABSOLUTE) {
                     break;
                 }
                 #$absolut->setPosition($owner->top + $absolut->top, $owner->left + $absolut->left);

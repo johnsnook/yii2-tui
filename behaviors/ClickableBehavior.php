@@ -11,9 +11,11 @@ namespace johnsnook\tui\behaviors;
 
 use johnsnook\tui\components\Style;
 use johnsnook\tui\components\Observer;
+use johnsnook\tui\events\ControlEvent;
 use johnsnook\tui\elements\Element;
 use johnsnook\tui\events\KeyPressEvent;
 use johnsnook\tui\events\MouseEvent;
+use johnsnook\tui\Tui;
 
 /**
  * Signals interest in and provides method for ClickEvents
@@ -57,39 +59,8 @@ class ClickableBehavior extends ControlBehavior {
      * {@inheritDoc}
      */
     public function beforeShow($event) {
-        $this->bufferLabel();
-    }
-
-    /**
-     * This class has the ability to use a shortcut key.  If a label has an
-     * underscore before a letter, then that letter becomes the shortcut keys letter.
-     * So we need find the position of the underscore, remove it, and highlight
-     * the character by adding an underline
-     *
-     * Welcome the 3rd edition of "prepareLabel".  Takes a string with or without
-     * an underscore and writes it to the center of the buffer.  At some point
-     * I should add text justification to the Style.  Maybe a $labelRect?
-     */
-    protected function bufferLabel() {
-        $owner = $this->owner;
-        if ($owner->style->textAlign === Style::CENTER) {
-            $y = round(($owner->height > 2) ? ($owner->height / 2) : 1);
-            $x = round(($owner->width / 2) - ($this->labelLength / 2));
-        } else {
-            $y = 1 + $owner->style->paddingTop;
-            $x = 1 + $owner->style->paddingLeft;
-        }
-
-        $label = str_replace('_', '', $this->label);
-        $owner->buffer->writeToRow($label, $y - 1, $x - 1);
-
-        if (($shortcutPos = strpos($this->label, '_')) !== false) {
-            $letter = substr($label, $shortcutPos, 1);
-            $this->shortcutKey = strtolower($letter);
-            $owner->buffer->code($y - 1, $x + $shortcutPos - 1, $this->shortcutKeyDecorator);
-        } else {
-            $this->shortcutKey = null;
-        }
+#        $this->owner->width += $this->labelLength;
+        //$this->bufferLabel();
     }
 
     /**
@@ -122,9 +93,7 @@ class ClickableBehavior extends ControlBehavior {
     public function keypressHandler(KeyPressEvent $event) {
         if ($event->description === "{$this->keyModifier}{$this->shortcutKey}") {
             $this->owner->onMouseDown($event);
-            //$this->owner->trigger(Observer::EVENT_MOUSE_LEFT_DOWN, $event);
-            time_nanosleep(0, 330000000);
-            //$this->owner->trigger(Observer::EVENT_MOUSE_LEFT_UP, $event);
+            time_nanosleep(0, 250000000);
             $this->owner->onMouseUp($event);
             $this->owner->trigger(self::CLICK_EVENT, new ControlEvent());
             $event->handled = true;
@@ -143,14 +112,12 @@ class ClickableBehavior extends ControlBehavior {
          * offscreen or something
          */
         Tui::$observer->off(Observer::MOUSE_LEFT_UP, [$this, 'mouseUpHandler']);
-        $rect = $this->absoluteRectangle;
+        $rect = $this->owner->absoluteRectangle;
         if ($rect->pointInMe($event->point)) {
-            //$this->onMouseDown($event);
-            $this->owner->trigger(Observer::EVENT_MOUSE_LEFT_DOWN, $event);
-
-            /**
-             * we only care about mouse ups if we've already registered a mouse down
-             */
+            if (method_exists($this->owner, 'onMouseDown')) {
+                $this->owner->onMouseDown($event);
+            }
+            /** we only care about mouse ups if we've already registered a mouse down */
             Tui::$observer->on(Observer::MOUSE_LEFT_UP, [$this, 'mouseUpHandler']);
             $event->handled = true;
         }
@@ -162,10 +129,11 @@ class ClickableBehavior extends ControlBehavior {
      * @param MouseEvent $event The MouseEvent that triggered this method to be called
      */
     public function mouseUpHandler(MouseEvent $event) {
-        $rect = $this->absoluteRectangle;
-        $this->onMouseUp($event);
+        $rect = $this->owner->absoluteRectangle;
         if ($rect->pointInMe($event->point)) { //$this->pMouseDown && Boxy::pointInRectangle($event->point, $rect
-            $this->owner->trigger(Observer::EVENT_MOUSE_LEFT_UP, $event);
+            if (method_exists($this->owner, 'onMouseUp')) {
+                $this->owner->onMouseUp($event);
+            }
             $this->owner->trigger(self::CLICK_EVENT, new ControlEvent());
             $event->handled = true;
         }

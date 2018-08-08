@@ -20,8 +20,6 @@ use johnsnook\tui\components\Observer;
  */
 class KeyPressEvent extends \yii\base\Event {
 
-    use \johnsnook\tui\traits\DebugTrait;
-
     const EXTENDED_SHIFT = '1;2';
     const EXTENDED_ALT = '1;3';
     const EXTENDED_CTRL = '1;5';

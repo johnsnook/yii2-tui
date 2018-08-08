@@ -13,9 +13,10 @@ use johnsnook\tui\elements\Button;
 use johnsnook\tui\elements\Container;
 use johnsnook\tui\elements\Element;
 use johnsnook\tui\elements\menu\Separator;
+use johnsnook\tui\components\Observer;
 use johnsnook\tui\components\Style;
 use johnsnook\tui\helpers\Format;
-use johnsnook\tui\events\ElementEvent;
+use johnsnook\tui\behaviors\ClickableBehavior;
 use johnsnook\tui\events\MouseEvent;
 use johnsnook\tui\Tui;
 
@@ -75,7 +76,7 @@ class Menu extends Container { //implements ClickableInterface
 
         /** if we're owned by a MenuBarItem, position ourself accordingly. */
         if ($this->owner instanceof MenuBarItem) {
-            $this->owner->on(ElementEvent::ELEMENT_MOVE_EVENT, [$this, 'onOwnerMove']);
+            $this->owner->on(Element::MOVE_EVENT, [$this, 'onOwnerMove']);
             $rect = $this->owner->absolutePosition;
             $this->move($rect->top + 1, $rect->left);
         }
@@ -97,10 +98,11 @@ class Menu extends Container { //implements ClickableInterface
                 $element->style->textAlign = Style::NONE;
                 $element->resize(1, $this->width - 2);
                 $element->move($i++, 2);
+                $element->on(ClickableBehavior::CLICK_EVENT, [$this, 'hideMenu']);
                 #$element->bufferLabel();
             }
         }
-        return false;
+        return true;
     }
 
     public function onOwnerMove($event) {
@@ -113,7 +115,7 @@ class Menu extends Container { //implements ClickableInterface
      */
     public function afterShow() {
         parent::afterShow();
-        Tui::$observer->on(\johnsnook\tui\events\MouseEvent::EVENT_MOUSE_LEFT_UP, [$this, 'hideMenu'], false);
+        Tui::$observer->on(Observer::MOUSE_LEFT_UP, [$this, 'hideMenu'], false);
     }
 
     /**
@@ -128,7 +130,10 @@ class Menu extends Container { //implements ClickableInterface
      */
     public function afterHide() {
         parent::afterHide();
-        Tui::$observer->off(\johnsnook\tui\events\MouseEvent::EVENT_MOUSE_LEFT_UP, [$this, 'hideMenu']);
+        Tui::$observer->off(Observer::MOUSE_LEFT_UP, [$this, 'hideMenu']);
+        foreach ($this->elements as $element) {
+            $element->off(ClickableBehavior::CLICK_EVENT, [$this, 'hideMenu']);
+        }
     }
 
 }

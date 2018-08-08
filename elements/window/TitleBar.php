@@ -10,19 +10,23 @@
 
 namespace johnsnook\tui\elements\window;
 
-use johnsnook\tui\components\Style;
 use johnsnook\tui\behaviors\DraggableBehavior;
-use johnsnook\tui\events\DragEvent;
+use johnsnook\tui\components\Style;
+use johnsnook\tui\elements\Control;
 use johnsnook\tui\elements\Element;
+use johnsnook\tui\events\DragEvent;
+use johnsnook\tui\helpers\Unicodes;
+use johnsnook\tui\helpers\Format;
+use \johnsnook\tui\helpers\Debug;
 
-class TitleBar extends \johnsnook\tui\elements\Control {
+class TitleBar extends Control {
 
     public $label = 'Untitled';
 
     public function init() {
         parent::init();
         $this->height = 1;
-        #$this->style->pull = Style::TOP;
+        $this->style->pull = Style::TOP;
     }
 
     /**
@@ -36,6 +40,14 @@ class TitleBar extends \johnsnook\tui\elements\Control {
                 'class' => DraggableBehavior::className(),
             ]
         ];
+    }
+
+    public function beforeShow() {
+        parent::beforeShow();
+        $label = Unicodes::mbStringPad($this->label, $this->width, Unicodes::THREE_LINES, STR_PAD_BOTH);
+        $pen = $this->style->getPen(Format::FG_GREY, Format::xtermBgColor(93), Format::BOLD);
+        $this->buffer->writeToRow($label, 0, 0, $pen);
+        Debug::log($this, $this->absoluteRectangle);
     }
 
     public function afterShow() {

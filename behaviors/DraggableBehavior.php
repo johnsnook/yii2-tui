@@ -97,11 +97,13 @@ class DraggableBehavior extends \yii\base\Behavior {
          * offscreen or something
          */
         Tui::$observer->off(Observer::MOUSE_LEFT_UP, [$this, 'mouseUpHandler']);
-        if ($this->dragRect->pointInMe($event->point)) {
+        if ($this->dragRectangle->pointInMe($event->point)) {
             $this->dragEvent = new DragEvent([
                 'startPoint' => $event->point
             ]);
-            $this->trigger(self::DRAG_BEGIN, $this->dragEvent);
+            if (method_exists($this->owner, 'onStartDrag')) {
+                $this->owner->onStartDrag($this->dragEvent);
+            }
             /** listen for the mouse up */
             Tui::$observer->on(Observer::MOUSE_LEFT_UP, [$this, 'mouseUpHandler']);
             $event->handled = true;
@@ -112,7 +114,10 @@ class DraggableBehavior extends \yii\base\Behavior {
         // detach ourself
         Tui::$observer->off(Observer::MOUSE_LEFT_UP, [$this, 'mouseUpHandler']);
         $this->dragEvent->endPoint = $event->point;
-        $this->trigger(self::DRAG_END, $this->dragEvent);
+        if (method_exists($this->owner, 'onEndDrag')) {
+            $this->owner->onEndDrag($this->dragEvent);
+        }
+        //$this->trigger(self::DRAG_END, $this->dragEvent);
         $event->handled = true;
     }
 

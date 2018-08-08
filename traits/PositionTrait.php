@@ -72,16 +72,16 @@ trait PositionTrait {
      * @return stdClass [$X, $Y]
      */
     public function getAbsolutePosition() {
-        if (($this->style->position === False) || $this->style->position === Style::ABSOLUTE) {
+        if (($this->style->positioning === False) || $this->style->positioning === Style::ABSOLUTE) {
             return (object) ['x' => $this->left, 'y' => $this->top];
-        } elseif ($this->style->position === Style::RELATIVE) {
+        } elseif ($this->style->positioning === Style::RELATIVE) {
             $element = $this;
             $absolut = (object) ['x' => $this->left, 'y' => $this->top];
             while ($owner = $element->owner) {
                 $absolut->top += $owner->top;
                 $absolut->left += $owner->left;
                 #$absolut->setPosition($owner->top + $absolut->top, $owner->left + $absolut->left);
-                if ($owner->style->position === Style::ABSOLUTE) {
+                if ($owner->style->positioning === Style::ABSOLUTE) {
                     return $absolut;
                 }
                 $element = $owner;
@@ -118,13 +118,13 @@ trait PositionTrait {
             $this->pHeight = floor($container->height * ($style->height / 100));
         }
 
-        if ($style->position === Style::Y) {
+        if ($style->positioning === Style::Y) {
             $this->pY = $container->top;
-        } elseif ($style->position === Style::BOTTOM) {
+        } elseif ($style->positioning === Style::BOTTOM) {
             $this->pY = $container->top + $container->height - $this->pHeight;
-        } elseif ($style->position === Style::X) {
+        } elseif ($style->positioning === Style::X) {
             $this->pX = $container->left;
-        } elseif ($style->position === Style::RIGHT) {
+        } elseif ($style->positioning === Style::RIGHT) {
             $this->pX = $container->left + $container->width - $container->pWidth;
         }
 

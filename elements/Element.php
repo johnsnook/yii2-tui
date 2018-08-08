@@ -161,6 +161,7 @@ class Element extends \yii\base\Component {
          * This should be called in any element that has its own css defined
          */
         $this->addClassStyle();
+        Boxy::applyStyle($this);
 
         /** if a value is still not set, set it to a positive integer (1) */
         $this->dimensions->normalize();
@@ -283,6 +284,10 @@ class Element extends \yii\base\Component {
         }
     }
 
+    /**
+     *
+     * @return Rectangle
+     */
     public function getRectangle() {
         return new Rectangle($this->top, $this->left, $this->height, $this->width);
     }
@@ -355,6 +360,9 @@ class Element extends \yii\base\Component {
         $val = ($val < 1 ? 1 : $val);
         $h = Tui::$observer->height;
         $this->dimensions->height = ($val > $h ? $h : $val);
+        if ($this->buffer) {
+            $this->buffer->build();
+        }
     }
 
     /**
@@ -373,6 +381,9 @@ class Element extends \yii\base\Component {
         $val = ($val < 1 ? 1 : $val);
         $w = Tui::$observer->width;
         $this->dimensions->width = ($val > $w ? $w : $val);
+        if ($this->buffer) {
+            $this->buffer->build();
+        }
     }
 
     /**
@@ -486,16 +497,15 @@ class Element extends \yii\base\Component {
      * @return Point
      */
     public function getAbsolutePosition() {
-
-        if (($this->style->position === False) || $this->style->position === Style::ABSOLUTE) {
+        if (($this->style->positioning === False) || $this->style->positioning === Style::ABSOLUTE) {
             return $this->location;
-        } elseif ($this->style->position === Style::RELATIVE) {
+        } elseif ($this->style->positioning === Style::RELATIVE) {
             $element = $this;
             $absolut = clone $this->location;
             while ($owner = $element->owner) {
                 $absolut->top += $owner->top - 1;
                 $absolut->left += $owner->left - 1;
-                if ($owner->style->position === Style::ABSOLUTE) {
+                if ($owner->style->positioning === Style::ABSOLUTE) {
                     break;
                 }
                 #$absolut->setPosition($owner->top + $absolut->top, $owner->left + $absolut->left);
@@ -503,6 +513,7 @@ class Element extends \yii\base\Component {
             }
             return $absolut;
         }
+        Debug::log($this, [$this->style->css, $this->location]);
     }
 
     /**

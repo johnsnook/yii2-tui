@@ -6,6 +6,7 @@
  * @license https://snooky.biz/site/license
  * @copyright 2018 John Snook Consulting
  */
+use johnsnook\tui\components\Style;
 use johnsnook\tui\elements\Button;
 use johnsnook\tui\elements\menu\Menu;
 use johnsnook\tui\elements\menu\MenuBar;
@@ -24,34 +25,55 @@ return [
     ],
     'elements' => [
         'fileMenuItem' => [
-            'class' => MenuBarItem::className(),
+            'class' => Button::className(),
+            'css' => [
+                'height' => 1,
+                'paddingLeft' => 1,
+                'paddingRight' => 1,
+                'borderWidth' => Style::NONE,
+                'borderStyle' => Style::NONE,
+            ],
             'label' => '_File',
-            'menu' => [
-                'class' => Menu::className(),
-                'elements' => [
-                    'newFile' => [
-                        'class' => Button::className(),
-                        'label' => '_New',
-                        'on click' => function ($data) {
-                            Tui::$program->statusBar->text = "New File";
-                        }
-                    ],
-                    'openFile' => [
-                        'class' => Button::className(),
-                        'label' => '_Open',
-                        'on click' => function ($data) {
-                            Tui::$program->testWindow->open();
-                        }
-                    ],
-                    'sep' => ['class' => Separator::className()],
-                    'quit' => [
-                        'class' => Button::className(),
-                        'label' => '_Quit',
-                        'on click' => function () {
-                            Tui::$program->end();
-                        }
-                    ]
-                ]]
+            'on click' => function ($data) {
+                $menu = Tui::$program->menuBar->fileMenu;
+                $menu->visible = !$menu->visible;
+                if ($menu->visible) {
+                    $menu->show();
+                } else {
+                    $menu->hide();
+                }
+            }
+        ],
+        'fileMenu' => [
+            'class' => Menu::className(),
+            'visible' => false,
+            'css' => [
+                'positioning' => Style::ABSOLUTE
+            ],
+            'elements' => [
+                'newFile' => [
+                    'class' => Button::className(),
+                    'label' => '_New',
+                    'on click' => function ($data) {
+                        Tui::$program->statusBar->text = "New File";
+                    }
+                ],
+                'openFile' => [
+                    'class' => Button::className(),
+                    'label' => '_Open',
+                    'on click' => function ($data) {
+                        Tui::$program->testWindow->open();
+                    }
+                ],
+                'sep' => ['class' => Separator::className()],
+                'quit' => [
+                    'class' => Button::className(),
+                    'label' => '_Quit',
+                    'on click' => function () {
+                        Tui::$program->end();
+                    }
+                ]
+            ]
         ]
-    ]
+    ],
 ];

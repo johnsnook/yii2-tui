@@ -12,43 +12,43 @@ namespace johnsnook\tui\helpers;
 use yii\base\UnknownPropertyException;
 
 /**
- * A simple object with an X,Y for coordinates
- * @property integer $x The X coordinate
- * @property integer $y The Y coordinate
+ * A simple object with an LEFT,TOP for coordinates
+ * @property integer $left The LEFT coordinate
+ * @property integer $top The TOP coordinate
  */
 class Point {
 
     const NOT_SET = -1;
 
     /**
-     * @var integer The X coordinate
+     * @var integer The LEFT coordinate
      */
-    public $x = self::NOT_SET;
+    public $left = self::NOT_SET;
 
     /**
-     * @var integer The Y coordinate
+     * @var integer The TOP coordinate
      */
-    public $y = self::NOT_SET;
+    public $top = self::NOT_SET;
 
     /**
      *
-     * @param integer $x The column coordinate
-     * @param integer $y The row coordinate
+     * @param integer $left The column coordinate
+     * @param integer $top The row coordinate
      * @throws \UnexpectedValueException Better pass in integers
      */
-    public function __construct($x = self::NOT_SET, $y = self::NOT_SET) {
-        if (!is_numeric($x)) {
-            throw new \UnexpectedValueException("Point::x must be numeric, '$x' given.");
+    public function __construct($left = self::NOT_SET, $top = self::NOT_SET) {
+        if (!is_numeric($left)) {
+            throw new \UnexpectedValueException("Point::left must be numeric, '$left' given.");
         }
-        if (!is_numeric($y)) {
-            throw new \UnexpectedValueException("Point::y must be numeric, '$y' given.");
+        if (!is_numeric($top)) {
+            throw new \UnexpectedValueException("Point::top must be numeric, '$top' given.");
         }
-        $this->left = (int) $x;
-        $this->top = (int) $y;
+        $this->left = (int) $left;
+        $this->top = (int) $top;
     }
 
     public function __toString() {
-        return "x: {$this->left}, y: {$this->top}";
+        return "left: {$this->left}, top: {$this->top}";
     }
 
     public function normalize() {

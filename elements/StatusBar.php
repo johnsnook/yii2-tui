@@ -17,23 +17,25 @@ use johnsnook\tui\elements\Element;
  */
 class StatusBar extends Element {
 
-    public $text;
+	public $text;
 
-    public function beforeShow() {
-        if (parent::beforeShow()) {
-            $this->changeText($this->text);
-        }
-    }
+	public function beforeShow() {
+		if (parent::beforeShow()) {
+			$this->changeText($this->text);
+			return true;
+		}
+		return false;
+	}
 
-    public function changeText($text) {
-        $length = strlen($text);
-        $oldLength = strlen($this->text);
-        $this->text = $text;
-        if ($length <= $oldLength) {
-            $text = str_pad($text, $oldLength);
-        }
-        $this->buffer->writeToRow($text, 0, $this->style->paddingLeft);
-        $this->draw();
-    }
+	public function changeText($text) {
+		$length = strlen($text);
+		$oldLength = strlen($this->text);
+		$this->text = $text;
+		if ($length <= $oldLength) {
+			$text = str_pad($text, $oldLength);
+		}
+		$this->buffer->writeToRow($text, 0, $this->style->paddingLeft);
+		$this->draw();
+	}
 
 }
