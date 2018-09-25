@@ -17,11 +17,12 @@ namespace johnsnook\tui;
 /**
  * Static class to provide services to all objects in the Tui app.
  */
-class Tui {
+class Tui {//extends \yii\base\Module implements \yii\base\BootstrapInterface
 
     /**
      * @var components\Program Allows global access to the program.
      */
+
     public static $program;
 
     /**
